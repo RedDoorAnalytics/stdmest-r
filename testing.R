@@ -21,10 +21,10 @@ dt <- read_dta(file = "~/Documents/proj-bsw-1cvd/data/91-data3CIA-pp.dta") |>
   mutate(`4.mmrc0_4` = as.numeric(mmrc0_4 == 4))
 
 ## Load estimation results
-estimation_results = read_e(
+estimation_results <- read_e(
   path_eb = "~/Documents/proj-bsw-1cvd/data/91-eb.xlsx",
   path_eV = "~/Documents/proj-bsw-1cvd/data/91-eV.xlsx"
-  )
+)
 
 ## Times for predictions
 .times <- seq(0, max(dt$follow_up_months), length.out = 100)
