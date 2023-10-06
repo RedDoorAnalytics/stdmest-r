@@ -4,12 +4,18 @@
 \alias{Stata.model.matrix}
 \title{Create a Model Matrix Compatible With Stata}
 \usage{
-Stata.model.matrix(..., eb)
+Stata.model.matrix(fixed, random, data, eb)
 }
 \arguments{
-\item{...}{Everything that is passed to \code{\link[stats:model.matrix]{stats::model.matrix()}}, e.g., model
-formula and data. Ideally, create indicator (one-hot encoding) variables
+\item{fixed}{Formula for the fixed effects part of the model, passed to
+\code{\link[stats:model.matrix]{stats::model.matrix()}}. Ideally, create indicator (one-hot encoding) variables
 by hand, thus avoiding calling, e.g., \code{factor()}.}
+
+\item{random}{Formula for the random effects part of the model, passed to
+\code{\link[stats:model.matrix]{stats::model.matrix()}}. Remove the overall intercept by having \verb{[...] - 1}
+in the formula.}
+
+\item{data}{Dataset in which formulae are to be evaluated.}
 
 \item{eb}{Fitted model coefficients, i.e., after using \code{\link[=read_e]{read_e()}}.}
 }

@@ -1,4 +1,4 @@
-Package: stmepred
+Package: stdmest
 Type: Package
 Title: Regression Standardisation for Hierarchical Survival Models
 Version: 0.0.0.9000
@@ -23,7 +23,13 @@ VignetteBuilder: knitr
 Depends: 
   R (>= 2.10)
 Imports:
+  matrixStats,
+  mvtnorm,
   stringr,
+  Rcpp,
   readxl
 Suggests:
   knitr
+LinkingTo:
+  Rcpp,
+  RcppArmadillo

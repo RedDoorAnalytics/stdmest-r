@@ -20,5 +20,5 @@
 #' @keywords datasets
 #'
 #' @examples
-#' data("data3CIA", package = "stmepred")
+#' data("data3CIA", package = "stdmest")
 "data3CIA"

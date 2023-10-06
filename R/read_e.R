@@ -13,12 +13,12 @@ read_e <- function(path_eb, path_eV) {
   # Read e(b)
   tbl <- readxl::read_excel(path = path_eb, skip = 1)
   tbl$`...1` <- NULL
-  eb <- as.numeric(tbl[1, ])
-  names(eb) <- names(tbl)
+  eb <- matrix(data = as.numeric(tbl[1, ]), nrow = 1)
+  colnames(eb) <- names(tbl)
   # Read e(V)
   eV <- readxl::read_excel(path = path_eV, col_names = FALSE)
   eV <- as.matrix(eV)
-  colnames(eV) <- names(eb)
+  colnames(eV) <- colnames(eb)
   rownames(eV) <- names(eb)
   # Return
   out <- list(eb = eb, eV = eV)

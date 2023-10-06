@@ -23,7 +23,7 @@ data3CIA
 A random subset of the 3CIA database of COPD patients.
 }
 \examples{
-data("data3CIA", package = "stmepred")
+data("data3CIA", package = "stdmest")
 }
 \references{
 \itemize{
