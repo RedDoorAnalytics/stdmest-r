@@ -49,5 +49,5 @@ data3CIA <- data3CIA |>
 data3CIA <- data3CIA |>
   mutate(cohort = as.numeric(cohort))
 
-## Export in Stata format
+## Export
 usethis::use_data(data3CIA, overwrite = TRUE)
