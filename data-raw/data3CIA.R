@@ -29,6 +29,8 @@
 ## Packages
 library(tidyverse)
 library(tramME)
+library(usethis)
+library(haven)
 
 ## Load data
 load(system.file(file.path("demo-data", "ipd.rda"), package = "tramME"))
@@ -50,4 +52,5 @@ data3CIA <- data3CIA |>
   mutate(cohort = as.numeric(cohort))
 
 ## Export
-usethis::use_data(data3CIA, overwrite = TRUE)
+use_data(data3CIA, overwrite = TRUE)
+write_dta(data = data3CIA, path = "data-raw/data3CIA.dta")
