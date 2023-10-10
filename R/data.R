@@ -22,3 +22,24 @@
 #' @examples
 #' data("data3CIA", package = "stdmest")
 "data3CIA"
+
+#' @title Simulated Three-Level Data
+#'
+#' @description A simulated dataset with a three-levels hierarchical structure and
+#'     a time to event outcome.
+#'
+#' @format A data frame the following columns:
+#' * `hospital_id`, ID of the 3^rd^ level of hierarchy (highest);
+#' * `provider_id`, ID of the 2^nd^ level of hierarchy;
+#' * `patient_id`, ID of the 1^st^ level of hierarchy (lowest);
+#' * `X1`, continuous covariate recorded at a patient-level;
+#' * `X2`, a second continuous covariate recorded at a patient-level;
+#' * `X3`, a binary covariate recorded at a patient-level;
+#' * `t`, time to event data;
+#' * `d`, event indicator variable, where 1 = event and 0 = censoring.
+#'
+#' @keywords datasets
+#'
+#' @examples
+#' data("data3Lsim", package = "stdmest")
+"data3Lsim"
