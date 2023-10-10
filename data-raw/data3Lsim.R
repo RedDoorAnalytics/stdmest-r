@@ -13,8 +13,8 @@ library(haven)
 set.seed(945738)
 
 ## Setup
-n <- 25000 # subjects
-m <- 1000 # hospitals
+n <- 20000 # subjects
+m <- 500 # hospitals
 s <- 10 # surgeons per hospital
 
 ## Base data
@@ -23,7 +23,7 @@ base <- base |>
   mutate(
     X1 = rnorm(n = n),
     X2 = rnorm(n = n, sd = 5),
-    X3 = rbinom(n = n, size = 1, prob = 0.4)
+    X3 = rbinom(n = n, size = 1, prob = 0.3)
   )
 
 ## For multinomial logistic cluster assignment, see:
