@@ -2,7 +2,7 @@
 % Please edit documentation in R/stdmest.R
 \name{stdmest}
 \alias{stdmest}
-\title{Regression Standardisation for Two-Levels Hierarchical Survival Models}
+\title{Regression Standardisation for Hierarchical Survival Models}
 \usage{
 stdmest(
   t,
@@ -32,16 +32,20 @@ including all fixed effects to standardised over.}
 
 \item{Sigma}{Estimated variance-covariance matrix, likely produced by \code{\link[=read_e]{read_e()}}.}
 
-\item{b}{Value of the random intercept to fix.}
+\item{b}{Value of the random intercept to fix. Can be a vector if multiple
+hierarchical levels are present.}
 
 \item{bse}{Standard error of \code{'b'}, required for the algorithm used when computing
-confidence intervals.}
+confidence intervals. Can be a vector if multiple hierarchical levels are
+present.}
 
 \item{bref}{Value of the random intercept to fix as reference level. Defaults
-to 0. Required when the argument \code{contrast = TRUE}.}
+to 0. Required when the argument \code{contrast = TRUE}. Can be a vector if multiple
+hierarchical levels are present.}
 
 \item{brefse}{Standard error of \code{'bref'}, required for the algorithm used when computing
-confidence intervals.}
+confidence intervals. Can be a vector if multiple hierarchical levels are
+present.}
 
 \item{contrast}{Should a contrast be computed (e.g., survival difference comparing
 \code{'b'} vs \verb{'bref})? Defaults to \code{TRUE}.}
@@ -62,5 +66,7 @@ method (\code{method = "normal"}).}
 \item{alpha}{Confidence level. Defaults to 0.05 for 95\% confidence intervals.}
 }
 \description{
-A short description needs to go here...
+This can be used to compute standardised survival probabilities
+(over the case-mix covariates) while fixing the value of one (or more)
+random intercepts.
 }
