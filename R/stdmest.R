@@ -50,7 +50,7 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
   distribution <- match.arg(arg = distribution, choices = c("exponential", "weibull"), several.ok = FALSE)
 
   #
-  t = matrix(data = t, ncol = 1)
+  t <- matrix(data = t, ncol = 1)
 
   #
   betaX <- beta[, colnames(beta) %in% colnames(X), drop = FALSE]
