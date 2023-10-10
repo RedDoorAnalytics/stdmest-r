@@ -8,28 +8,28 @@ library(furrr)
 devtools::load_all()
 
 ## Load data
-dt <- read_dta(file = "~/Documents/proj-bsw-1cvd/data/91-data3CIA-pp.dta") |>
+dt <- read_dta(file = "data-raw/data3CIA-pp.dta") |>
   zap_formats() |>
   zap_label() |>
   zap_labels() |>
-  mutate(`0b.mmrc0_4` = as.numeric(mmrc0_4 == 0)) |>
-  mutate(`1.mmrc0_4` = as.numeric(mmrc0_4 == 1)) |>
-  mutate(`2.mmrc0_4` = as.numeric(mmrc0_4 == 2)) |>
-  mutate(`3.mmrc0_4` = as.numeric(mmrc0_4 == 3)) |>
-  mutate(`4.mmrc0_4` = as.numeric(mmrc0_4 == 4))
+  mutate(`0b.mmrc` = as.numeric(mmrc == 0)) |>
+  mutate(`1.mmrc` = as.numeric(mmrc == 1)) |>
+  mutate(`2.mmrc` = as.numeric(mmrc == 2)) |>
+  mutate(`3.mmrc` = as.numeric(mmrc == 3)) |>
+  mutate(`4.mmrc` = as.numeric(mmrc == 4))
 
 ## Load estimation results
 estimation_results <- read_e(
-  path_eb = "~/Documents/proj-bsw-1cvd/data/91-eb.xlsx",
-  path_eV = "~/Documents/proj-bsw-1cvd/data/91-eV.xlsx"
+  path_eb = "data-raw/data3CIA-eb.xlsx",
+  path_eV = "data-raw/data3CIA-eV.xlsx"
 )
 
 ## Times for predictions
-.times <- seq(0, max(dt$follow_up_months), length.out = 200)
+.times <- seq(0, max(dt$months), length.out = 100)
 
 ## Usage in our settings:
 modm <- Stata.model.matrix(
-  fixed = ~ age + fev1pp + `0b.mmrc0_4` + `1.mmrc0_4` + `2.mmrc0_4` + `3.mmrc0_4` + `4.mmrc0_4`,
+  fixed = ~ age + fev1pp + `0b.mmrc` + `1.mmrc` + `2.mmrc` + `3.mmrc` + `4.mmrc`,
   random = ~ b - 1,
   data = dt,
   eb = estimation_results$eb
