@@ -21,6 +21,6 @@ putexcel set "data-raw/data3Lsim-eV.xlsx", replace
 putexcel A1 = matrix(eV)
 
 // predict random effect, with their SEs, and export that
-predict b_h b_h_s, reffects reses(bse_h bse_h_s)
+predict b_hospital b_provider, reffects reses(bse_hospital bse_provider)
 compress
 save "data-raw/data3Lsim-pp.dta", replace

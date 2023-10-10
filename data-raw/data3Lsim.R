@@ -13,17 +13,17 @@ library(haven)
 set.seed(945738)
 
 ## Setup
-n <- 20000 # subjects
+n <- 25000 # subjects
 m <- 500 # hospitals
-s <- 10 # surgeons per hospital
+s <- 15 # surgeons per hospital
 
 ## Base data
 base <- tibble(id = seq(n))
 base <- base |>
   mutate(
     X1 = rnorm(n = n),
-    X2 = rnorm(n = n, sd = 5),
-    X3 = rbinom(n = n, size = 1, prob = 0.3)
+    X2 = rnorm(n = n, sd = 4),
+    X3 = rbinom(n = n, size = 1, prob = 0.2)
   )
 
 ## For multinomial logistic cluster assignment, see:
@@ -59,9 +59,9 @@ base$surgeon <- apply(ps, MARGIN = 1, function(x) sample(x = seq(ncol(ps)), size
 
 ## Random effects
 bh <- distinct(base, hospital)
-bh <- mutate(bh, bh = rnorm(n = nrow(bh), sd = sqrt(.5)))
+bh <- mutate(bh, bh = rnorm(n = nrow(bh), sd = sqrt(5)))
 bs <- distinct(base, surgeon)
-bs <- mutate(bs, bs = rnorm(n = nrow(bs), sd = sqrt(.1)))
+bs <- mutate(bs, bs = rnorm(n = nrow(bs), sd = 1))
 
 ## Survival parameters
 lambda <- 0.1
