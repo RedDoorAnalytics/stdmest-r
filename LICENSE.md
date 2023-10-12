@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2023 stmepred authors
+Copyright (c) 2023 Red Door Analytics AB and {stmepred} authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
