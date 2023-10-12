@@ -54,6 +54,30 @@ a |>
   geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
   geom_line(aes(y = Sdiff))
 
+## Comparison with Stata
+
+## Times for predictions
+.times <- seq(0, 200, length.out = 5)
+
+## Usage in our settings:
+modm <- Stata.model.matrix(
+  fixed = ~ age + fev1pp + `0b.mmrc` + `1.mmrc` + `2.mmrc` + `3.mmrc` + `4.mmrc`,
+  random = ~ b - 1,
+  data = dt,
+  eb = estimation_results$eb
+)
+
+# Comparison with Stata
+Smin <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = -1.006262, bse = .2222539, distribution = "weibull", contrast = TRUE)
+Smin2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed[dt$cohort == 18, ], Sigma = estimation_results$eV, b = -1.006262, bse = .2222539, distribution = "weibull", contrast = TRUE)
+data.frame(tt = .times, Smin = Smin$S, Smin2 = Smin2$S)
+#    tt      Smin     Smin2
+# 1   0 1.0000000 1.0000000
+# 2  50 0.9318754 0.9245237
+# 3 100 0.8372385 0.8198216
+# 4 150 0.7427501 0.7159733
+# 5 200 0.6560073 0.6216718
+
 ###
 ### Three-levels example
 ###
