@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# {stmepred}
+# {stdmest}
 
 <!-- badges: start -->
 
@@ -10,4 +10,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 This is a prototype package to implement regression standardisation for
-hierarchical units comparisons in multilevel survival models.
+(fair) comparison between hierarchical units in multilevel survival
+models. It is the R equivalent of
+[`stdmest`](https://github.com/RedDoorAnalytics/stdmest) in Stata,
+useful for reasoning about implementation details and for comparison
+purposes.
