@@ -97,7 +97,7 @@ estimation_results <- read_e(
 )
 
 ## Times for predictions
-.times <- seq(0, max(dt$t), length.out = 100)
+.times <- seq(0, max(dt$t), length.out = 200)
 
 ## Usage in our settings:
 modm <- Stata.model.matrix(
@@ -135,3 +135,15 @@ a |>
   geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
   geom_line(aes(y = Sdiff)) +
   facet_wrap(~hospital_id, labeller = label_both)
+# animated version
+library(gganimate)
+a |>
+  ggplot(aes(x = t, group = provider_id)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
+  geom_line(aes(y = Sdiff)) +
+  transition_states(hospital_id) +
+  enter_fade() +
+  exit_fade() +
+  ease_aes("linear") +
+  labs(title = "Hospital: {closest_state}")
