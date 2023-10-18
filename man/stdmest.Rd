@@ -17,7 +17,7 @@ stdmest(
   distribution,
   conf.int = FALSE,
   B = 100,
-  method = "percentile",
+  cimethod = "percentile",
   alpha = 0.05
 )
 }
@@ -59,9 +59,9 @@ computed? Defaults to \code{FALSE}, as the algorithm is computationally intensiv
 \item{B}{How many replications should the algorithm for computing confidence
 intervals use? Defaults to 100.}
 
-\item{method}{Method used to obtain confidence intervals. Possible values are
-the percentile method (\code{method = "percentile"}) or the normal approximation
-method (\code{method = "normal"}).}
+\item{cimethod}{Method used to obtain confidence intervals. Possible values are
+the percentile method (\code{cimethod = "percentile"}, the default) or the normal
+approximation method (\code{cimethod = "normal"}).}
 
 \item{alpha}{Confidence level. Defaults to 0.05 for 95\% confidence intervals.}
 }

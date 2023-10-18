@@ -29,13 +29,13 @@
 #'     computed? Defaults to `FALSE`, as the algorithm is computationally intensive.
 #' @param B How many replications should the algorithm for computing confidence
 #'     intervals use? Defaults to 100.
-#' @param method Method used to obtain confidence intervals. Possible values are
-#'     the percentile method (`method = "percentile"`) or the normal approximation
-#'     method (`method = "normal"`).
+#' @param cimethod Method used to obtain confidence intervals. Possible values are
+#'     the percentile method (`cimethod = "percentile"`, the default) or the normal
+#'     approximation method (`cimethod = "normal"`).
 #' @param alpha Confidence level. Defaults to 0.05 for 95% confidence intervals.
 #'
 #' @export
-stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = FALSE, distribution, conf.int = FALSE, B = 100, method = "percentile", alpha = 0.05) {
+stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = FALSE, distribution, conf.int = FALSE, B = 100, cimethod = "percentile", alpha = 0.05) {
   # dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
   #   zap_formats() |>
   #   zap_label() |>
@@ -75,7 +75,7 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
   # conf.int <- TRUE
 
   # Match
-  method <- match.arg(arg = method, choices = c("percentile", "normal"), several.ok = FALSE)
+  cimethod <- match.arg(arg = cimethod, choices = c("percentile", "normal"), several.ok = FALSE)
   distribution <- match.arg(arg = distribution, choices = c("exponential", "weibull"), several.ok = FALSE)
 
   # Check that length of b, bse, bref, brefse is the same
@@ -132,7 +132,7 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
       new_Sref <- predictMeanSurv1(t = t, X = X, betaX = new_betaX, b = new_bref, ln_p = new_ln_p)
       new_Sdiff <- new_S - new_Sref
     }
-    if (method == "percentile") {
+    if (cimethod == "percentile") {
       S_conf.low <- matrixStats::rowQuantiles(x = new_S, probs = alpha / 2)
       S_conf.high <- matrixStats::rowQuantiles(x = new_S, probs = 1 - alpha / 2)
       if (contrast) {
@@ -141,7 +141,7 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
         Sdiff_conf.low <- matrixStats::rowQuantiles(x = new_Sdiff, probs = alpha / 2)
         Sdiff_conf.high <- matrixStats::rowQuantiles(x = new_Sdiff, probs = 1 - alpha / 2)
       }
-    } else if (method == "normal") {
+    } else if (cimethod == "normal") {
       z.crit <- stats::qnorm(p = 1 - alpha / 2)
       S_conf.low <- S - matrixStats::rowSds(x = new_S) * z.crit
       S_conf.high <- S + matrixStats::rowSds(x = new_S) * z.crit
