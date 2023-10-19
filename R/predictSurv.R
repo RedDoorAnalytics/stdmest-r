@@ -14,4 +14,3 @@ predictMeanSurv1R <- function(t, X, betaX, b, ln_p) {
   }
   return(output)
 }
-}
