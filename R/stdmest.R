@@ -98,13 +98,15 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
 
   # Create a single combined b to use
   b_sum <- sum(b)
+  b_sum <- matrix(data = b_sum, ncol = 1)
 
   # Point estimate
-  S <- predictMeanSurv1(t = t, X = X, betaX = betaX, b = b_sum, ln_p = ln_p)
+  S <- predictMeanSurv1R(t = t, X = X, betaX = betaX, b = b_sum, ln_p = ln_p)
   # Contrast, if required
   if (contrast) {
     bref_sum <- sum(bref)
-    Sref <- predictMeanSurv1(t = t, X = X, betaX = betaX, b = bref_sum, ln_p = ln_p)
+    bref_sum <- matrix(data = bref_sum, ncol = 1)
+    Sref <- predictMeanSurv1R(t = t, X = X, betaX = betaX, b = bref_sum, ln_p = ln_p)
     Sdiff <- S - Sref
   }
   # CIs
@@ -127,9 +129,9 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
       new_bref <- matrixStats::rowSums2(x = new_bref)
       new_bref <- matrix(data = new_bref, ncol = 1)
     }
-    new_S <- predictMeanSurv1(t = t, X = X, betaX = new_betaX, b = new_b, ln_p = new_ln_p)
+    new_S <- predictMeanSurv1R(t = t, X = X, betaX = new_betaX, b = new_b, ln_p = new_ln_p)
     if (contrast) {
-      new_Sref <- predictMeanSurv1(t = t, X = X, betaX = new_betaX, b = new_bref, ln_p = new_ln_p)
+      new_Sref <- predictMeanSurv1R(t = t, X = X, betaX = new_betaX, b = new_bref, ln_p = new_ln_p)
       new_Sdiff <- new_S - new_Sref
     }
     if (cimethod == "percentile") {
