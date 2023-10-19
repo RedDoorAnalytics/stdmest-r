@@ -60,23 +60,25 @@ a |>
 .times <- seq(0, 200, length.out = 5)
 
 ## Usage in our settings:
+dt_to_use <- subset(dt, dt$months > 0)
 modm <- Stata.model.matrix(
   fixed = ~ age + fev1pp + `0b.mmrc` + `1.mmrc` + `2.mmrc` + `3.mmrc` + `4.mmrc`,
   random = ~ b - 1,
-  data = dt,
+  data = dt_to_use,
   eb = estimation_results$eb
 )
 
 # Comparison with Stata
-Smin <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = -1.006262, bse = .2222539, distribution = "weibull", contrast = TRUE, conf.int = TRUE, B = 2000, cimethod = "normal")
-Smin2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed[dt$cohort == 18, ], Sigma = estimation_results$eV, b = -1.006262, bse = .2222539, distribution = "weibull", contrast = TRUE, conf.int = TRUE, B = 2000, cimethod = "normal")
+set.seed(20231018)
+Smin <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = -1.006262, bse = .2222539, distribution = "weibull", conf.int = TRUE, B = 2000)
+Smin2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed[dt_to_use$cohort == 18, ], Sigma = estimation_results$eV, b = -1.006262, bse = .2222539, distribution = "weibull", conf.int = TRUE, B = 2000)
 data.frame(tt = .times, Smin = Smin$S, Smin_lower = Smin$S_conf.low, Smin_upper = Smin$S_conf.high, Smin2 = Smin2$S, Smin2_lower = Smin2$S_conf.low, Smin2_upper = Smin2$S_conf.high)
 #    tt      Smin Smin_lower Smin_upper     Smin2 Smin2_lower Smin2_upper
 # 1   0 1.0000000  1.0000000  1.0000000 1.0000000   1.0000000   1.0000000
-# 2  50 0.9318754  0.8997094  0.9640413 0.9245237   0.8874684   0.9615790
-# 3 100 0.8372385  0.7688946  0.9055824 0.8198216   0.7416359   0.8980073
-# 4 150 0.7427501  0.6470008  0.8384994 0.7159733   0.6077461   0.8242006
-# 5 200 0.6560073  0.5421759  0.7698387 0.6216718   0.4948546   0.7484891
+# 2  50 0.9319127  0.8929531  0.9571315 0.9245237   0.8830277   0.9533136
+# 3 100 0.8373119  0.7583575  0.8940225 0.8198216   0.7327097   0.8853843
+# 4 150 0.7428443  0.6347484  0.8260286 0.7159733   0.5979398   0.8129497
+# 5 200 0.6561102  0.5315389  0.7571369 0.6216718   0.4896364   0.7419416
 
 ###
 ### Three-levels example
