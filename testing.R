@@ -5,6 +5,8 @@ library(ragg)
 library(mvtnorm)
 library(matrixStats)
 library(furrr)
+library(fastGHQuad)
+library(ggtext)
 devtools::load_all()
 
 ###
@@ -90,7 +92,8 @@ dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
   zap_label() |>
   zap_labels() |>
   mutate(`0b.X3` = as.numeric(X3 == 0)) |>
-  mutate(`1.X3` = as.numeric(X3 == 1))
+  mutate(`1.X3` = as.numeric(X3 == 1)) |>
+  filter(`_st` == 1)
 
 ## Load estimation results
 estimation_results <- read_e(
@@ -99,7 +102,7 @@ estimation_results <- read_e(
 )
 
 ## Times for predictions
-.times <- seq(0, max(dt$t), length.out = 200)
+.times <- seq(0, max(dt$t), length.out = 120)
 
 ## Usage in our settings:
 modm <- Stata.model.matrix(
@@ -109,9 +112,8 @@ modm <- Stata.model.matrix(
   eb = estimation_results$eb
 )
 
-reffs <- distinct(dt, hospital_id, b_hospital, bse_hospital, provider_id, b_provider, bse_provider) |>
-  left_join(distinct(dt, hospital_id, b_hospital) |> mutate(rank_hospital = rank(b_hospital))) |>
-  filter(rank_hospital <= 5 | rank_hospital >= max(rank_hospital) - 5)
+reffs <- filter(dt, hospital_id <= 9) |>
+  distinct(hospital_id, b_hospital, bse_hospital, provider_id, b_provider, bse_provider)
 
 plan(multisession)
 a <- future_map(.x = seq(nrow(reffs)), .f = function(i) {
@@ -137,15 +139,33 @@ a |>
   geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
   geom_line(aes(y = Sdiff)) +
   facet_wrap(~hospital_id, labeller = label_both)
-# animated version
-library(gganimate)
+
+###
+### Three-levels example, partially marginal
+### (This should be in the middle of the different lines from the previous plot)
+###
+
+reffsm <- distinct(reffs, hospital_id, b_hospital, bse_hospital)
+
+plan(multisession)
+am <- future_map(.x = seq(nrow(reffsm)), .f = function(i) {
+  out <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = reffsm$b_hospital[i], bse = reffsm$bse_hospital[i], bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull", contrast = TRUE, conf.int = TRUE)
+  out$hospital_id <- reffsm$hospital_id[i]
+  out$b_hospital <- reffsm$b_hospital[i]
+  return(out)
+}, .progress = TRUE, .options = furrr_options(seed = 45986))
+plan(sequential)
+am <- bind_rows(am)
+
 a |>
   ggplot(aes(x = t, group = provider_id)) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.05) +
   geom_line(aes(y = Sdiff)) +
-  transition_states(hospital_id) +
-  enter_fade() +
-  exit_fade() +
-  ease_aes("linear") +
-  labs(title = "Hospital: {closest_state}")
+  geom_ribbon(data = am, aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high, group = hospital_id), alpha = 0.1, fill = "red") +
+  geom_line(data = am, aes(y = Sdiff, group = hospital_id), color = "red") +
+  facet_wrap(~hospital_id, labeller = label_both) +
+  theme_bw(base_size = 12, base_family = "Atkinson Hyperlegible") +
+  theme(plot.title = element_textbox_simple()) +
+  labs(x = "Time", y = "Standardised Survival Difference", title = "Black lines denote provider-specific standardised survival differences (with the theoretical overall average as the reference). Red lines denote the hospital-specific standardised survival differences, marginally over providers.")
+ggsave(filename = "testing.png", device = ragg::agg_png, width = 8, height = 7, dpi = 300)
