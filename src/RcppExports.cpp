@@ -41,10 +41,49 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// predictIntSurv
+arma::vec predictIntSurv(const double& t, const arma::mat& X, const arma::vec& betaX, const double& b, const double& ln_p, const double& varmarg, const arma::vec& dnrm, const arma::vec& GHx, const arma::vec& GHw);
+RcppExport SEXP _stdmest_predictIntSurv(SEXP tSEXP, SEXP XSEXP, SEXP betaXSEXP, SEXP bSEXP, SEXP ln_pSEXP, SEXP varmargSEXP, SEXP dnrmSEXP, SEXP GHxSEXP, SEXP GHwSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double& >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type betaX(betaXSEXP);
+    Rcpp::traits::input_parameter< const double& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const double& >::type ln_p(ln_pSEXP);
+    Rcpp::traits::input_parameter< const double& >::type varmarg(varmargSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type dnrm(dnrmSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type GHx(GHxSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type GHw(GHwSEXP);
+    rcpp_result_gen = Rcpp::wrap(predictIntSurv(t, X, betaX, b, ln_p, varmarg, dnrm, GHx, GHw));
+    return rcpp_result_gen;
+END_RCPP
+}
+// predictMeanIntSurv
+arma::mat predictMeanIntSurv(const arma::vec& t, const arma::mat& X, const arma::mat& betaX, const arma::vec& b, const arma::vec& ln_p, const arma::vec& varmarg, const arma::vec& GHx, const arma::vec& GHw);
+RcppExport SEXP _stdmest_predictMeanIntSurv(SEXP tSEXP, SEXP XSEXP, SEXP betaXSEXP, SEXP bSEXP, SEXP ln_pSEXP, SEXP varmargSEXP, SEXP GHxSEXP, SEXP GHwSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type betaX(betaXSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type ln_p(ln_pSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type varmarg(varmargSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type GHx(GHxSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type GHw(GHwSEXP);
+    rcpp_result_gen = Rcpp::wrap(predictMeanIntSurv(t, X, betaX, b, ln_p, varmarg, GHx, GHw));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_stdmest_predictSurv1", (DL_FUNC) &_stdmest_predictSurv1, 5},
     {"_stdmest_predictMeanSurv1", (DL_FUNC) &_stdmest_predictMeanSurv1, 5},
+    {"_stdmest_predictIntSurv", (DL_FUNC) &_stdmest_predictIntSurv, 9},
+    {"_stdmest_predictMeanIntSurv", (DL_FUNC) &_stdmest_predictMeanIntSurv, 8},
     {NULL, NULL, 0}
 };
 

@@ -9,3 +9,11 @@ predictMeanSurv1 <- function(t, X, betaX, b, ln_p) {
     .Call(`_stdmest_predictMeanSurv1`, t, X, betaX, b, ln_p)
 }
 
+predictIntSurv <- function(t, X, betaX, b, ln_p, varmarg, dnrm, GHx, GHw) {
+    .Call(`_stdmest_predictIntSurv`, t, X, betaX, b, ln_p, varmarg, dnrm, GHx, GHw)
+}
+
+predictMeanIntSurv <- function(t, X, betaX, b, ln_p, varmarg, GHx, GHw) {
+    .Call(`_stdmest_predictMeanIntSurv`, t, X, betaX, b, ln_p, varmarg, GHx, GHw)
+}
+

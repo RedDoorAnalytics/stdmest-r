@@ -3,6 +3,7 @@
 export(Stata.model.matrix)
 export(read_e)
 export(stdmest)
+export(stdmestm)
 import(Rcpp)
 import(readxl)
 import(stringr)
