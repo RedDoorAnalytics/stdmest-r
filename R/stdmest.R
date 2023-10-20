@@ -94,7 +94,7 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
   } else if (distribution == "weibull") {
     ln_p <- matrix(data = beta[, "ln_p"])
   }
-  if (!is.finite(ln_p)) stop("Something went wrong, could not extract 'ln_p' from 'beta'. Check your input values.", call. = FALSE)
+  if (!is.finite(ln_p)) stop("Could not pick 'ln_p' from 'beta'. Check your input values.", call. = FALSE)
 
   # Create a single combined b to use
   b_sum <- sum(b)
