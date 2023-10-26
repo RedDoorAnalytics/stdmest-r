@@ -102,7 +102,7 @@ estimation_results <- read_e(
 )
 
 ## Times for predictions
-.times <- seq(0, max(dt$t), length.out = 120)
+.times <- seq(0, max(dt$t), length.out = 5)
 
 ## Usage in our settings:
 modm <- Stata.model.matrix(
@@ -112,39 +112,48 @@ modm <- Stata.model.matrix(
   eb = estimation_results$eb
 )
 
-reffs <- filter(dt, hospital_id <= 9) |>
-  distinct(hospital_id, b_hospital, bse_hospital, provider_id, b_provider, bse_provider)
-
-plan(multisession)
-a <- future_map(.x = seq(nrow(reffs)), .f = function(i) {
-  out <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(reffs$b_hospital[i], reffs$b_provider[i]), bse = c(reffs$bse_hospital[i], reffs$bse_provider[i]), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", contrast = TRUE, conf.int = TRUE)
-  out$hospital_id <- reffs$hospital_id[i]
-  out$b_hospital <- reffs$b_hospital[i]
-  out$provider_id <- reffs$provider_id[i]
-  out$b_provider <- reffs$b_provider[i]
-  return(out)
-}, .progress = TRUE, .options = furrr_options(seed = 9943756))
-plan(sequential)
-a <- bind_rows(a)
-a |>
-  ggplot(aes(x = t, group = provider_id)) +
-  geom_ribbon(aes(ymin = S_conf.low, ymax = S_conf.high, fill = "S"), alpha = 0.05) +
-  geom_ribbon(aes(ymin = Sref_conf.low, ymax = Sref_conf.high, fill = "Sref"), alpha = 0.05) +
-  geom_line(aes(y = S, color = "S")) +
-  geom_line(aes(y = Sref, color = "Sref")) +
-  facet_wrap(~hospital_id, labeller = label_both)
-a |>
-  ggplot(aes(x = t, group = provider_id)) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
-  geom_line(aes(y = Sdiff)) +
-  facet_wrap(~hospital_id, labeller = label_both)
+set.seed(349856)
+reffs <- distinct(dt, hospital_id, b_hospital, bse_hospital, provider_id, b_provider, bse_provider) |>
+  filter(b_hospital %in% sample(unique(dt$b_hospital), 2)) |>
+  arrange(b_hospital, b_provider) |>
+  group_by(hospital_id) |>
+  slice_sample(n = 1) |>
+  ungroup()
+reffs
+# # A tibble: 2 × 6
+#   hospital_id b_hospital bse_hospital provider_id b_provider bse_provider
+#         <dbl>      <dbl>        <dbl>       <dbl>      <dbl>        <dbl>
+# 1          88      0.878        0.311        4420      0.122        0.570
+# 2         397      2.65         0.407        3078     -0.298        0.522
+a1 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(0.878, 0.122), bse = c(0.311, 0.570), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", conf.int = TRUE, B = 1000)
+a2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(2.65, -0.298), bse = c(0.407, 0.522), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", conf.int = TRUE, B = 1000)
+data.frame(tt = .times, Sa1 = a1$S, Sa1_lower = a1$S_conf.low, Sa1_upper = a1$S_conf.high, Sa2 = a2$S, Sa2_lower = a2$S_conf.low, Sa2_upper = a2$S_conf.high)
+#     tt         Sa1     Sa1_lower  Sa1_upper           Sa2         Sa2_lower    Sa2_upper
+# 1  0.0 1.000000000 1.00000000000 1.00000000 1.00000000000 1.000000000000000 1.0000000000
+# 2  2.5 0.206141020 0.03663736990 0.56280915 0.02954803823 0.001095191712201 0.1742659124
+# 3  5.0 0.027802364 0.00155561484 0.20642266 0.00114208034 0.000012519062559 0.0203890047
+# 4  7.5 0.004786736 0.00013407866 0.07249750 0.00009295082 0.000000333420280 0.0032747521
+# 5 10.0 0.001041533 0.00001876592 0.02719375 0.00001306697 0.000000004926098 0.0006816634
 
 ###
 ### Three-levels example, partially marginal
-### (This should be in the middle of the different lines from the previous plot)
 ###
 
+# First, calculate some "fully conditional" predictions
+set.seed(934867)
+.times <- seq(0, max(dt$t), length.out = 100)
+reffs <- distinct(dt, hospital_id, b_hospital, bse_hospital, provider_id, b_provider, bse_provider) |>
+  filter(b_hospital %in% sample(unique(dt$b_hospital), 9))
+plan(multisession)
+a <- future_map(.x = seq(nrow(reffs)), .f = function(i) {
+  preds <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(reffs$b_hospital[i], reffs$b_provider[i]), bse = c(reffs$bse_hospital[i], reffs$bse_provider[i]), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", contrast = TRUE, conf.int = TRUE)
+  preds$hospital_id <- reffs$hospital_id[i]
+  preds$provider_id <- reffs$provider_id[i]
+  return(preds)
+}, .progress = TRUE, .options = furrr_options(sdeed = 32475))
+plan(sequential)
+
+#
 reffsm <- distinct(reffs, hospital_id, b_hospital, bse_hospital)
 
 plan(multisession)
