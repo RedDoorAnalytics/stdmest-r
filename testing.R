@@ -150,8 +150,9 @@ a <- future_map(.x = seq(nrow(reffs)), .f = function(i) {
   preds$hospital_id <- reffs$hospital_id[i]
   preds$provider_id <- reffs$provider_id[i]
   return(preds)
-}, .progress = TRUE, .options = furrr_options(sdeed = 32475))
+}, .progress = TRUE, .options = furrr_options(seed = 32475))
 plan(sequential)
+a <- bind_rows(a)
 
 #
 reffsm <- distinct(reffs, hospital_id, b_hospital, bse_hospital)
@@ -178,3 +179,17 @@ a |>
   theme(plot.title = element_textbox_simple()) +
   labs(x = "Time", y = "Standardised Survival Difference", title = "Black lines denote provider-specific standardised survival differences (with the theoretical overall average as the reference). Red lines denote the hospital-specific standardised survival differences, marginally over providers.")
 ggsave(filename = "testing.png", device = ragg::agg_png, width = 8, height = 7, dpi = 300)
+
+###
+### Code for comparing with Stata's implementation
+###
+
+.times <- seq(0, 10, length.out = 5)
+out <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull")
+out
+#      t           S
+# 1  0.0 1.000000000
+# 2  2.5 0.252036599
+# 3  5.0 0.052759040
+# 4  7.5 0.013903120
+# 5 10.0 0.004391529
