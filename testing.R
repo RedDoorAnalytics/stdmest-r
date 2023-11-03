@@ -84,6 +84,21 @@ data.frame(tt = .times, Smin = Smin$S, Smin_lower = Smin$S_conf.low, Smin_upper 
 # 5 200 0.6561102  0.5315389  0.7571369 0.6216718   0.4896364   0.7419416
 
 ###
+### Drawing multivariate normal samples using SVD
+###
+
+n.values <- 1e6
+eb <- estimation_results$eb
+eV <- estimation_results$eV
+std_norm <- matrix(data = rnorm(ncol(eV) * n.values), nrow = n.values, ncol = ncol(eV))
+svdd <- svd(eV)
+rand_data_svd <- t(svdd$u %*% (diag(sqrt(svdd$d))) %*% t(std_norm))
+for (i in 1:ncol(eV)) {
+  rand_data_svd[, i] <- rand_data_svd[, i] + eb[i]
+}
+cov(rand_data_svd) - eV
+
+###
 ### Three-levels example
 ###
 
@@ -126,15 +141,15 @@ reffs
 #         <dbl>      <dbl>        <dbl>       <dbl>      <dbl>        <dbl>
 # 1          88      0.878        0.311        4420      0.122        0.570
 # 2         397      2.65         0.407        3078     -0.298        0.522
-a1 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(0.878, 0.122), bse = c(0.311, 0.570), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", conf.int = TRUE, B = 1000)
-a2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(2.65, -0.298), bse = c(0.407, 0.522), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", conf.int = TRUE, B = 1000)
+a1 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(0.878, 0.122), bse = c(0.311, 0.570), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", conf.int = TRUE, B = 2000, cimethod = "normal")
+a2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = c(2.65, -0.298), bse = c(0.407, 0.522), bref = c(0, 0), brefse = c(0, 0), distribution = "weibull", conf.int = TRUE, B = 2000, cimethod = "normal")
 data.frame(tt = .times, Sa1 = a1$S, Sa1_lower = a1$S_conf.low, Sa1_upper = a1$S_conf.high, Sa2 = a2$S, Sa2_lower = a2$S_conf.low, Sa2_upper = a2$S_conf.high)
-#     tt         Sa1     Sa1_lower  Sa1_upper           Sa2         Sa2_lower    Sa2_upper
-# 1  0.0 1.000000000 1.00000000000 1.00000000 1.00000000000 1.000000000000000 1.0000000000
-# 2  2.5 0.206141020 0.03663736990 0.56280915 0.02954803823 0.001095191712201 0.1742659124
-# 3  5.0 0.027802364 0.00155561484 0.20642266 0.00114208034 0.000012519062559 0.0203890047
-# 4  7.5 0.004786736 0.00013407866 0.07249750 0.00009295082 0.000000333420280 0.0032747521
-# 5 10.0 0.001041533 0.00001876592 0.02719375 0.00001306697 0.000000004926098 0.0006816634
+#     tt         Sa1   Sa1_lower  Sa1_upper           Sa2    Sa2_lower   Sa2_upper
+# 1  0.0 1.000000000  1.00000000 1.00000000 1.00000000000  1.000000000 1.000000000
+# 2  2.5 0.206141020 -0.05329716 0.46557920 0.02954803823 -0.079408427 0.138504503
+# 3  5.0 0.027802364 -0.06700799 0.12261272 0.00114208034 -0.015675085 0.017959246
+# 4  7.5 0.004786736 -0.02944316 0.03901663 0.00009295082 -0.003372755 0.003558657
+# 5 10.0 0.001041533 -0.01251203 0.01459510 0.00001306697 -0.000879363 0.000905497
 
 ###
 ### Three-levels example, partially marginal
@@ -186,11 +201,11 @@ ggsave(filename = "testing.png", device = ragg::agg_png, width = 8, height = 7, 
 ###
 
 .times <- seq(0, 10, length.out = 5)
-out <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull", contrast = TRUE, conf.int = TRUE, B = 1000)
+out <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull", contrast = TRUE, conf.int = TRUE, B = 2000, cimethod = "normal")
 out
-#      t           S  S_conf.low S_conf.high       Sref Sref_conf.low Sref_conf.high       Sdiff Sdiff_conf.low Sdiff_conf.high
-# 1  0.0 1.000000000 1.000000000  1.00000000 1.00000000    1.00000000     1.00000000  0.00000000     0.00000000     0.000000000
-# 2  2.5 0.252036599 0.142002966  0.39251123 0.45942711    0.41078546     0.50984459 -0.20739051    -0.31299824    -0.074832136
-# 3  5.0 0.052759040 0.020628460  0.11523944 0.15662493    0.12680588     0.19318323 -0.10386589    -0.14412758    -0.042416205
-# 4  7.5 0.013903120 0.004252328  0.03861359 0.05815525    0.04355858     0.07763876 -0.04425213    -0.06122547    -0.020033732
-# 5 10.0 0.004391529 0.001111289  0.01460551 0.02382806    0.01680571     0.03389202 -0.01943654    -0.02766655    -0.009195976
+#      t           S    S_conf.low S_conf.high       Sref Sref_conf.low Sref_conf.high       Sdiff Sdiff_conf.low Sdiff_conf.high
+# 1  0.0 1.000000000  1.0000000000  1.00000000 1.00000000    1.00000000     1.00000000  0.00000000     0.00000000     0.000000000
+# 2  2.5 0.252036599  0.1164155373  0.38765766 0.45942711    0.40991674     0.50893748 -0.20739051    -0.33674710    -0.078033924
+# 3  5.0 0.052759040  0.0002934933  0.10522459 0.15662493    0.12366405     0.18958581 -0.10386589    -0.15691719    -0.050814596
+# 4  7.5 0.013903120 -0.0054939075  0.03330015 0.05815525    0.04131102     0.07499948 -0.04425213    -0.06597111    -0.022533158
+# 5 10.0 0.004391529 -0.0033833830  0.01216644 0.02382806    0.01537816     0.03227796 -0.01943654    -0.02917959    -0.009693476
