@@ -8,6 +8,7 @@ library(furrr)
 library(fastGHQuad)
 library(ggtext)
 devtools::load_all()
+options(scipen = 100)
 
 ###
 ### Two-levels example
@@ -185,11 +186,11 @@ ggsave(filename = "testing.png", device = ragg::agg_png, width = 8, height = 7, 
 ###
 
 .times <- seq(0, 10, length.out = 5)
-out <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull")
+out <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull", contrast = TRUE, conf.int = TRUE, B = 1000)
 out
-#      t           S
-# 1  0.0 1.000000000
-# 2  2.5 0.252036599
-# 3  5.0 0.052759040
-# 4  7.5 0.013903120
-# 5 10.0 0.004391529
+#      t           S  S_conf.low S_conf.high       Sref Sref_conf.low Sref_conf.high       Sdiff Sdiff_conf.low Sdiff_conf.high
+# 1  0.0 1.000000000 1.000000000  1.00000000 1.00000000    1.00000000     1.00000000  0.00000000     0.00000000     0.000000000
+# 2  2.5 0.252036599 0.142002966  0.39251123 0.45942711    0.41078546     0.50984459 -0.20739051    -0.31299824    -0.074832136
+# 3  5.0 0.052759040 0.020628460  0.11523944 0.15662493    0.12680588     0.19318323 -0.10386589    -0.14412758    -0.042416205
+# 4  7.5 0.013903120 0.004252328  0.03861359 0.05815525    0.04355858     0.07763876 -0.04425213    -0.06122547    -0.020033732
+# 5 10.0 0.004391529 0.001111289  0.01460551 0.02382806    0.01680571     0.03389202 -0.01943654    -0.02766655    -0.009195976
