@@ -1,22 +1,22 @@
 #' @title Read Estimation Results From Stata
 #'
-#' @param path_eb Path of .xlsx file containing `e(b)` estimation results as
-#'     exported by `putexcel` in Stata.
-#' @param path_eV Path of .xlsx file containing `e(V)` estimation results as
-#'     exported by `putexcel` in Stata.
+#' @param path Path of .xlsx file containing `mestreg` estimation results as
+#'     exported by `mestreg_export` in Stata (bundled with the `stdmest`
+#'     command).
 #'
 #' @return A list with two elements, one for `e(b)` (named `eb`) and one for `e(V)`
 #'     (named `eV`).
+#'
 #' @export
 #'
-read_e <- function(path_eb, path_eV) {
+read_e <- function(path) {
   # Read e(b)
-  tbl <- readxl::read_excel(path = path_eb, skip = 1)
+  tbl <- readxl::read_excel(path = path, skip = 1, sheet = "e(b)")
   tbl$`...1` <- NULL
   eb <- matrix(data = as.numeric(tbl[1, ]), nrow = 1)
   colnames(eb) <- names(tbl)
   # Read e(V)
-  eV <- readxl::read_excel(path = path_eV, col_names = FALSE)
+  eV <- readxl::read_excel(path = path, col_names = FALSE, sheet = "e(V)")
   eV <- as.matrix(eV)
   colnames(eV) <- colnames(eb)
   rownames(eV) <- names(eb)

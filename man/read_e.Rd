@@ -4,14 +4,12 @@
 \alias{read_e}
 \title{Read Estimation Results From Stata}
 \usage{
-read_e(path_eb, path_eV)
+read_e(path)
 }
 \arguments{
-\item{path_eb}{Path of .xlsx file containing \code{e(b)} estimation results as
-exported by \code{putexcel} in Stata.}
-
-\item{path_eV}{Path of .xlsx file containing \code{e(V)} estimation results as
-exported by \code{putexcel} in Stata.}
+\item{path}{Path of .xlsx file containing \code{mestreg} estimation results as
+exported by \code{mestreg_export} in Stata (bundled with the \code{stdmest}
+command).}
 }
 \value{
 A list with two elements, one for \code{e(b)} (named \code{eb}) and one for \code{e(V)}
