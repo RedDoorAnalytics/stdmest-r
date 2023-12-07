@@ -11,14 +11,7 @@ stset t, failure(d)
 mestreg c.X1 c.X2 i.X3 || hospital_id: || provider_id:, dist(weibull)
 
 // export e(b) and e(V)
-*
-matrix eb = e(b)
-putexcel set "data-raw/data3Lsim-eb.xlsx", replace
-putexcel A1 = matrix(eb), names
-*
-matrix eV = e(V)
-putexcel set "data-raw/data3Lsim-eV.xlsx", replace
-putexcel A1 = matrix(eV)
+mestreg_export, filename("data-raw/data3Lsim-ebV.xlsx") replace
 
 // predict random effect, with their SEs, and export that
 predict b_hospital b_provider, reffects reses(bse_hospital bse_provider)

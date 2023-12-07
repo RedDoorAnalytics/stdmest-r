@@ -26,10 +26,7 @@ dt <- read_dta(file = "data-raw/data3CIA-pp.dta") |>
   mutate(`4.mmrc` = as.numeric(mmrc == 4))
 
 ## Load estimation results
-estimation_results <- read_e(
-  path_eb = "data-raw/data3CIA-eb.xlsx",
-  path_eV = "data-raw/data3CIA-eV.xlsx"
-)
+estimation_results <- read_e(path = "data-raw/data3CIA-ebV.xlsx")
 
 ## Times for predictions
 .times <- seq(0, max(dt$months), length.out = 100)
@@ -112,10 +109,7 @@ dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
   filter(`_st` == 1)
 
 ## Load estimation results
-estimation_results <- read_e(
-  path_eb = "data-raw/data3Lsim-eb.xlsx",
-  path_eV = "data-raw/data3Lsim-eV.xlsx"
-)
+estimation_results <- read_e(path = "data-raw/data3Lsim-ebV.xlsx")
 
 ## Times for predictions
 .times <- seq(0, max(dt$t), length.out = 5)
