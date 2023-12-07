@@ -134,8 +134,8 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
     }
     #
     new_varmarg <- new_beta[, varmargname, drop = FALSE]
-    # Make sure new_varmarg are >= 0
-    new_varmarg <- pmax(new_varmarg, 0.0)
+    # Make sure new_varmarg are positive values
+    new_varmarg <- pmax(new_varmarg, .Machine$double.eps)
     #
     if (contrast) {
       new_bref <- mvtnorm::rmvnorm(n = B, mean = bref, sigma = diag(brefse^2, nrow = length(brefse), ncol = length(brefse)))
