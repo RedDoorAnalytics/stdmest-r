@@ -1,6 +1,6 @@
 Package: stdmest
 Type: Package
-Title: Regression Standardisation for Hierarchical Survival Models
+Title: Post-Estimation Predictions for Standardised Hierarchical Contrasts after -mestreg- Models in Stata
 Version: 0.0.0.9000
 Authors@R: c(
   person(given = "Alessandro", 
