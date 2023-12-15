@@ -17,7 +17,7 @@ stdmestm(
   contrast = FALSE,
   distribution,
   conf.int = FALSE,
-  B = 100,
+  B = 1000,
   cimethod = "percentile",
   alpha = 0.05,
   nk = 7
@@ -59,7 +59,7 @@ and \code{"weibull"}.}
 computed? Defaults to \code{FALSE}, as the algorithm is computationally intensive.}
 
 \item{B}{How many replications should the algorithm for computing confidence
-intervals use? Defaults to 100.}
+intervals use? Defaults to 1000.}
 
 \item{cimethod}{Method used to obtain confidence intervals. Possible values are
 the percentile method (\code{cimethod = "percentile"}, the default) or the normal

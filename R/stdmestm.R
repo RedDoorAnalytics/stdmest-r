@@ -30,7 +30,7 @@
 #' @param conf.int Should confidence intervals for any standardised quantity be
 #'     computed? Defaults to `FALSE`, as the algorithm is computationally intensive.
 #' @param B How many replications should the algorithm for computing confidence
-#'     intervals use? Defaults to 100.
+#'     intervals use? Defaults to 1000.
 #' @param cimethod Method used to obtain confidence intervals. Possible values are
 #'     the percentile method (`cimethod = "percentile"`, the default) or the normal
 #'     approximation method (`cimethod = "normal"`).
@@ -41,7 +41,7 @@
 #'     between accuracy and computational cost.
 #'
 #' @export
-stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargname, contrast = FALSE, distribution, conf.int = FALSE, B = 100, cimethod = "percentile", alpha = 0.05, nk = 7) {
+stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargname, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", alpha = 0.05, nk = 7) {
   # dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
   #   zap_formats() |>
   #   zap_label() |>
