@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# {stdmest}
+# {stdmest}: Post-Estimation Predictions for Standardised Hierarchical Contrasts after -`mestreg`- Models in Stata
 
 <!-- badges: start -->
 
@@ -11,7 +11,35 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 This is a prototype package to implement regression standardisation for
 (fair) comparison between hierarchical units in multilevel survival
-models. It is the R equivalent of
-[`stdmest`](https://github.com/RedDoorAnalytics/stdmest) in Stata,
-useful for reasoning about implementation details and for comparison
-purposes.
+models.
+
+The {stdmest} package implements post-estimation predictions of
+standardised survival probabilities after fitting hierarchical survival
+models using -[`mestreg`](https://www.stata.com/manuals/memestreg.pdf)-
+in Stata. It is the R equivalent of the
+-[`stdmest`](https://github.com/RedDoorAnalytics/stdmest)- command in
+Stata.
+
+This package can be used to obtain predictions of, e.g., standardised
+survival probabilities while fixing best linear unbiased predictions
+(BLUPs) of the random effects at any level of the hierarchy.
+
+In other words, {stdmest} can obtain marginal predictions standardising
+across observed covariates (i.e., the fixed effects) while fixing
+predicted values of the random effects. Built-in post-estimation
+commands for -`mestreg`- can do the opposite, i.e., marginalising over
+the random effects.
+
+Moreover, the package includes a set of functions that can be used to
+import and pre-process estimation results exported from Stata, which are
+required to obtain predictions.
+
+## Installation
+
+The development version of `stdmest` can be installed from this GitHub
+repository by typing the following in your Stata console:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("RedDoorAnalytics/stdmest-r", build_vignettes = TRUE)
+```
