@@ -3,7 +3,6 @@
 \docType{package}
 \name{stdmest-package}
 \alias{stdmest-package}
-\alias{_PACKAGE}
 \title{Regression Standardisation for Hierarchical Survival Models}
 \description{
 Description goes here...

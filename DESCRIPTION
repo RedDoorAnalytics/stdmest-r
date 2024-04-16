@@ -1,7 +1,7 @@
 Package: stdmest
 Type: Package
 Title: Post-Estimation Predictions for Standardised Hierarchical Contrasts after -mestreg- Models in Stata
-Version: 0.0.0.9000
+Version: 0.0.0-9000
 Authors@R: c(
   person(given = "Alessandro", 
          family = "Gasparini", 
@@ -13,7 +13,7 @@ Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 URL: https://github.com/RedDoorAnalytics/stmepred
 BugReports: https://github.com/RedDoorAnalytics/stmepred
 Roxygen: list(markdown = TRUE)
