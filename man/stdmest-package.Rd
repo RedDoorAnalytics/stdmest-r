@@ -10,8 +10,8 @@ Description goes here...
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/RedDoorAnalytics/stmepred}
-  \item Report bugs at \url{https://github.com/RedDoorAnalytics/stmepred}
+  \item \url{https://github.com/RedDoorAnalytics/stdmest}
+  \item Report bugs at \url{https://github.com/RedDoorAnalytics/stdmest}
 }
 
 }

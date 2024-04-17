@@ -34,6 +34,11 @@
 #' @param cimethod Method used to obtain confidence intervals. Possible values are
 #'     the percentile method (`cimethod = "percentile"`, the default) or the normal
 #'     approximation method (`cimethod = "normal"`).
+#' @param cicloglog Should calculations for confidence intervals based on `cimethod = "normal"`
+#'     method be performed on the cloglog scale, to avoid confidence intervals outside the
+#'     range of possible values? Defaults to `FALSE`. Note that confidence intervals are
+#'     symmetric around the point estimates when `cicloglog = FALSE`, and they are not
+#'     symmetric otherwise.
 #' @param alpha Confidence level. Defaults to 0.05 for 95% confidence intervals.
 #' @param nk Number of nodes used for the numerical integration procedure: larger
 #'     values yield more accurate results, at the cost of additional computational
@@ -41,7 +46,7 @@
 #'     between accuracy and computational cost.
 #'
 #' @export
-stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargname, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", alpha = 0.05, nk = 7) {
+stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargname, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", cicloglog = FALSE, alpha = 0.05, nk = 7) {
   # dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
   #   zap_formats() |>
   #   zap_label() |>
@@ -161,11 +166,29 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
       }
     } else if (cimethod == "normal") {
       z.crit <- stats::qnorm(p = 1 - alpha / 2)
-      S_conf.low <- S - matrixStats::rowSds(x = new_S) * z.crit
-      S_conf.high <- S + matrixStats::rowSds(x = new_S) * z.crit
+      if (cicloglog) {
+        new_S <- cloglog(new_S)
+        new_S[new_S == -Inf | new_S == Inf] <- 0.0
+        S_conf.low <- cloglog(S) + matrixStats::rowSds(x = new_S) * z.crit
+        S_conf.high <- cloglog(S) - matrixStats::rowSds(x = new_S) * z.crit
+        S_conf.low <- cexpexp(S_conf.low)
+        S_conf.high <- cexpexp(S_conf.high)
+      } else {
+        S_conf.low <- S - matrixStats::rowSds(x = new_S) * z.crit
+        S_conf.high <- S + matrixStats::rowSds(x = new_S) * z.crit
+      }
       if (contrast) {
-        Sref_conf.low <- Sref - matrixStats::rowSds(x = new_Sref) * z.crit
-        Sref_conf.high <- Sref + matrixStats::rowSds(x = new_Sref) * z.crit
+        if (cicloglog) {
+          new_Sref <- cloglog(new_Sref)
+          new_Sref[new_Sref == -Inf | new_Sref == Inf] <- 0.0
+          Sref_conf.low <- cloglog(Sref) + matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.high <- cloglog(Sref) - matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.low <- cexpexp(Sref_conf.low)
+          Sref_conf.high <- cexpexp(Sref_conf.high)
+        } else {
+          Sref_conf.low <- Sref - matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.high <- Sref + matrixStats::rowSds(x = new_Sref) * z.crit
+        }
         Sdiff_conf.low <- Sdiff - matrixStats::rowSds(x = new_Sdiff) * z.crit
         Sdiff_conf.high <- Sdiff + matrixStats::rowSds(x = new_Sdiff) * z.crit
       }

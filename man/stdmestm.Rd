@@ -19,6 +19,7 @@ stdmestm(
   conf.int = FALSE,
   B = 1000,
   cimethod = "percentile",
+  cicloglog = FALSE,
   alpha = 0.05,
   nk = 7
 )
@@ -64,6 +65,12 @@ intervals use? Defaults to 1000.}
 \item{cimethod}{Method used to obtain confidence intervals. Possible values are
 the percentile method (\code{cimethod = "percentile"}, the default) or the normal
 approximation method (\code{cimethod = "normal"}).}
+
+\item{cicloglog}{Should calculations for confidence intervals based on \code{cimethod = "normal"}
+method be performed on the cloglog scale, to avoid confidence intervals outside the
+range of possible values? Defaults to \code{FALSE}. Note that confidence intervals are
+symmetric around the point estimates when \code{cicloglog = FALSE}, and they are not
+symmetric otherwise.}
 
 \item{alpha}{Confidence level. Defaults to 0.05 for 95\% confidence intervals.}
 

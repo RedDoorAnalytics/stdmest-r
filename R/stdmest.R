@@ -32,47 +32,52 @@
 #' @param cimethod Method used to obtain confidence intervals. Possible values are
 #'     the percentile method (`cimethod = "percentile"`, the default) or the normal
 #'     approximation method (`cimethod = "normal"`).
+#' @param cicloglog Should calculations for confidence intervals based on `cimethod = "normal"`
+#'     method be performed on the cloglog scale, to avoid confidence intervals outside the
+#'     range of possible values? Defaults to `FALSE`. Note that confidence intervals are
+#'     symmetric around the point estimates when `cicloglog = FALSE`, and they are not
+#'     symmetric otherwise.
 #' @param alpha Confidence level. Defaults to 0.05 for 95% confidence intervals.
 #'
 #' @export
-stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", alpha = 0.05) {
-  # dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
+stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", cicloglog = FALSE, alpha = 0.05) {
+  # library(tidyverse)
+  # library(haven)
+  # devtools::load_all()
+  # dt <- read_dta(file = "data-raw/data3CIA-pp.dta") |>
   #   zap_formats() |>
   #   zap_label() |>
   #   zap_labels() |>
-  #   mutate(`0b.X3` = as.numeric(X3 == 0)) |>
-  #   mutate(`1.X3` = as.numeric(X3 == 1))
-  # ## Load estimation results
-  # estimation_results <- read_e(
-  #   path_eb = "data-raw/data3Lsim-eb.xlsx",
-  #   path_eV = "data-raw/data3lsim-eV.xlsx"
-  # )
-  # ## Times for predictions
-  # .times <- seq(0, max(dt$t), length.out = 100)
-  # ## Usage in our settings:
+  #   mutate(`0b.mmrc` = as.numeric(mmrc == 0)) |>
+  #   mutate(`1.mmrc` = as.numeric(mmrc == 1)) |>
+  #   mutate(`2.mmrc` = as.numeric(mmrc == 2)) |>
+  #   mutate(`3.mmrc` = as.numeric(mmrc == 3)) |>
+  #   mutate(`4.mmrc` = as.numeric(mmrc == 4))
+  # estimation_results <- read_e(path = "data-raw/data3CIA-ebV.xlsx")
+  # .times <- seq(0, max(dt$months), length.out = 10)
   # modm <- Stata.model.matrix(
-  #   fixed = ~ X1 + X2 + `0b.X3` + `1.X3`,
-  #   random = ~ b_hospital + b_provider - 1,
+  #   fixed = ~ age + fev1pp + `0b.mmrc` + `1.mmrc` + `2.mmrc` + `3.mmrc` + `4.mmrc`,
+  #   random = ~ b - 1,
   #   data = dt,
   #   eb = estimation_results$eb
   # )
-  # this_b <- filter(dt, b_hospital == min(b_hospital)) |>
-  #   filter(b_provider == min(b_provider)) |>
-  #   distinct(b_hospital, bse_hospital, b_provider, bse_provider)
-  # t <- .times
-  # X <- modm$fixed
+  # best <- filter(dt, b == min(b)) |>
+  #   distinct(b, bse)
+  # t <- matrix(.times, ncol = 1)
   # beta <- estimation_results$eb
+  # X <- modm$fixed
   # Sigma <- estimation_results$eV
-  # b <- c(this_b$b_hospital, this_b$b_provider)
-  # bse <- c(this_b$bse_hospital, this_b$bse_provider)
-  # bref <- c(0, 0)
-  # brefse <- c(0, 0)
-  # contrast <- TRUE
+  # b <- best$b
+  # bse <- best$bse
   # distribution <- "weibull"
-  # B <- 50
-  # method <- "percentile"
-  # alpha <- 0.05
+  # contrast <- TRUE
   # conf.int <- TRUE
+  # bref <- 0
+  # brefse <- 0
+  # B <- 10
+  # cimethod <- "percentile"
+  # cicloglog <- FALSE
+  # alpha <- 0.05
 
   # Match
   cimethod <- match.arg(arg = cimethod, choices = c("percentile", "normal"), several.ok = FALSE)
@@ -145,11 +150,29 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
       }
     } else if (cimethod == "normal") {
       z.crit <- stats::qnorm(p = 1 - alpha / 2)
-      S_conf.low <- S - matrixStats::rowSds(x = new_S) * z.crit
-      S_conf.high <- S + matrixStats::rowSds(x = new_S) * z.crit
+      if (cicloglog) {
+        new_S <- cloglog(new_S)
+        new_S[new_S == -Inf | new_S == Inf] <- 0.0
+        S_conf.low <- cloglog(S) + matrixStats::rowSds(x = new_S) * z.crit
+        S_conf.high <- cloglog(S) - matrixStats::rowSds(x = new_S) * z.crit
+        S_conf.low <- cexpexp(S_conf.low)
+        S_conf.high <- cexpexp(S_conf.high)
+      } else {
+        S_conf.low <- S - matrixStats::rowSds(x = new_S) * z.crit
+        S_conf.high <- S + matrixStats::rowSds(x = new_S) * z.crit
+      }
       if (contrast) {
-        Sref_conf.low <- Sref - matrixStats::rowSds(x = new_Sref) * z.crit
-        Sref_conf.high <- Sref + matrixStats::rowSds(x = new_Sref) * z.crit
+        if (cicloglog) {
+          new_Sref <- cloglog(new_Sref)
+          new_Sref[new_Sref == -Inf | new_Sref == Inf] <- 0.0
+          Sref_conf.low <- cloglog(Sref) + matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.high <- cloglog(Sref) - matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.low <- cexpexp(Sref_conf.low)
+          Sref_conf.high <- cexpexp(Sref_conf.high)
+        } else {
+          Sref_conf.low <- Sref - matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.high <- Sref + matrixStats::rowSds(x = new_Sref) * z.crit
+        }
         Sdiff_conf.low <- Sdiff - matrixStats::rowSds(x = new_Sdiff) * z.crit
         Sdiff_conf.high <- Sdiff + matrixStats::rowSds(x = new_Sdiff) * z.crit
       }

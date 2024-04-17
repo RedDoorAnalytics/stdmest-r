@@ -54,6 +54,27 @@ a |>
   geom_ribbon(aes(ymin = Sdiff_conf.low, ymax = Sdiff_conf.high), alpha = 0.1) +
   geom_line(aes(y = Sdiff))
 
+## cloglog vs normal scale
+modm <- Stata.model.matrix(
+  fixed = ~ age + fev1pp + `0b.mmrc` + `1.mmrc` + `2.mmrc` + `3.mmrc` + `4.mmrc`,
+  random = ~ b - 1,
+  data = filter(dt, age <= 50),
+  eb = estimation_results$eb
+)
+.times <- seq(0, max(dt$months), length.out = 100)
+set.seed(20240417)
+a1 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = best$b, bse = best$bse, distribution = "weibull", contrast = FALSE, conf.int = TRUE, B = 10000, cimethod = "normal")
+set.seed(20240417)
+a2 <- stdmest(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = best$b, bse = best$bse, distribution = "weibull", contrast = FALSE, conf.int = TRUE, B = 10000, cimethod = "normal", cicloglog = TRUE)
+bind_rows(
+  a1 |> mutate(setting = "cicloglog = FALSE"),
+  a2 |> mutate(setting = "cicloglog = TRUE")
+) |>
+  ggplot(aes(x = t, y = S)) +
+  geom_ribbon(aes(ymin = S_conf.low, ymax = S_conf.high, fill = setting), alpha = 0.1) +
+  geom_line(aes(color = setting)) +
+  theme(legend.position = "inside", legend.position.inside = c(1, 1), legend.justification = c(1, 1), legend.background = element_blank())
+
 ## Comparison with Stata
 
 ## Times for predictions
@@ -203,3 +224,27 @@ out
 # 3  5.0 0.052759040  0.0002934933  0.10522459 0.15662493    0.12366405     0.18958581 -0.10386589    -0.15691719    -0.050814596
 # 4  7.5 0.013903120 -0.0054939075  0.03330015 0.05815525    0.04131102     0.07499948 -0.04425213    -0.06597111    -0.022533158
 # 5 10.0 0.004391529 -0.0033833830  0.01216644 0.02382806    0.01537816     0.03227796 -0.01943654    -0.02917959    -0.009693476
+
+###
+### Check cicloglog
+###
+
+.times <- seq(0, 10, length.out = 100)
+modm <- Stata.model.matrix(
+  fixed = ~ X1 + X2 + `0b.X3` + `1.X3`,
+  random = ~ b_hospital + b_provider - 1,
+  data = filter(dt, X1 > 0 & X2 > 0 & X3 == 1),
+  eb = estimation_results$eb
+)
+set.seed(20240417)
+out1 <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull", contrast = TRUE, conf.int = TRUE, cicloglog = FALSE, B = 2000, cimethod = "normal")
+set.seed(20240417)
+out2 <- stdmestm(t = matrix(.times, ncol = 1), beta = estimation_results$eb, X = modm$fixed, Sigma = estimation_results$eV, b = 0.878, bse = 0.311, bref = 0, brefse = 0, varmargname = "var(_cons[hospital_id>provider_id])", distribution = "weibull", contrast = TRUE, conf.int = TRUE, cicloglog = TRUE, B = 2000, cimethod = "normal")
+bind_rows(
+  out1 |> mutate(setting = "cicloglog = FALSE"),
+  out2 |> mutate(setting = "cicloglog = TRUE")
+) |>
+  ggplot(aes(x = t, y = S)) +
+  geom_ribbon(aes(ymin = S_conf.low, ymax = S_conf.high, fill = setting), alpha = 0.1) +
+  geom_line(aes(color = setting)) +
+  theme(legend.position = "inside", legend.position.inside = c(1, 1), legend.justification = c(1, 1), legend.background = element_blank())
