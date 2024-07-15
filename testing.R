@@ -248,3 +248,29 @@ bind_rows(
   geom_ribbon(aes(ymin = S_conf.low, ymax = S_conf.high, fill = setting), alpha = 0.1) +
   geom_line(aes(color = setting)) +
   theme(legend.position = "inside", legend.position.inside = c(1, 1), legend.justification = c(1, 1), legend.background = element_blank())
+
+###
+### Predict S from a RP model
+###
+
+library(tidyverse)
+library(rstpm2)
+data("brcancer")
+model.df <- 5
+model <- stpm2(Surv(rectime, censrec == 1) ~ hormon + x1 + x2 + x3 + x4 + x5 + x6 + x7, data = brcancer, df = model.df)
+nd <- crossing(
+  brcancer[1, ] |> select(-rectime),
+  rectime = seq(.Machine$double.eps, max(brcancer$rectime[brcancer$censrec == 1]), length.out = 100)
+)
+Sref <- predict(model, newdata = nd, type = "surv")
+spl <- nsx(x = log(brcancer$rectime[brcancer$censrec == 1]), df = model.df)
+Xb <- model.matrix(model@call.formula, data = nd)
+Xg <- predict(spl, newx = log(nd$rectime))
+beta <- coef(model)[names(coef(model)) %in% colnames(Xb)]
+gamma <- coef(model)[!(names(coef(model)) %in% colnames(Xb))]
+H <- exp(Xg %*% gamma + Xb %*% beta)
+Sag <- exp(-H)
+
+cbind(Sref, Sag)
+plot(nd$rectime, Sref, type = "l")
+points(nd$rectime, Sag, type = "l", col = "red")
