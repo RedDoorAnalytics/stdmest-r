@@ -24,6 +24,29 @@ modexpt, filename("data-raw/data3CIA-ebV-logl.xlsx") replace
 * predict random effect, with their SEs, and export that
 predict b_logl, reffects reses(bse_logl)
 
+// RP(3), from -stmixed-, with orthogonalised splines
+* Adjusting for age, FEV1, and dyspnea score
+tabulate mmrc, generate(immrc)
+stmixed age fev1pp immrc2 immrc3 immrc4 immrc5 || cohort: , dist(rp) df(3)
+* export e(b) and e(V)
+modexpt, filename("data-raw/data3CIA-ebV-rp3-orthog.xlsx") replace
+* predict random effect, with their SEs, and export that
+predict b_rp3orthog, reffects
+* SEs not currently supported by -stmixed-: will give SEs of zero (for now)
+generate bse_rp3orthog = 0.0
+drop _rcs*
+
+// RP(3), from -stmixed-, with non-orthogonalised splines
+* Adjusting for age, FEV1, and dyspnea score
+stmixed age fev1pp immrc2 immrc3 immrc4 immrc5 || cohort: , dist(rp) df(3) noorthog
+* export e(b) and e(V)
+modexpt, filename("data-raw/data3CIA-ebV-rp3-noorthog.xlsx") replace
+* predict random effect, with their SEs, and export that
+predict b_rp3noorthog, reffects
+* SEs not currently supported by -stmixed-: will give SEs of zero (for now)
+generate bse_rp3noorthog = 0.0
+drop _rcs*
+
 // Export
 compress
 save "data-raw/data3CIA-pp.dta", replace
