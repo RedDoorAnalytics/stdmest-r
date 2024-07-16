@@ -7,13 +7,16 @@
 read_e(path)
 }
 \arguments{
-\item{path}{Path of .xlsx file containing \code{mestreg} estimation results as
-exported by \code{mestreg_export} in Stata (bundled with the \code{stdmest}
+\item{path}{Path of .xlsx file containing \code{mestreg} or \code{stmixed} estimation
+results as exported by \code{modexpt} in Stata (bundled with the \code{stdmest}
 command).}
 }
 \value{
-A list with two elements, one for \code{e(b)} (named \code{eb}) and one for \code{e(V)}
-(named \code{eV}).
+A list with different components (depending on whether we are reading
+in results from \code{mestreg} or \code{stmixed}. Common elements will be \code{eb} (for
+\code{e(b)}) and \code{eV} (for \code{e(V)}), for the estimated coefficients and their
+variance-covariance matrix, among others. Check the input .xlsx file and
+\verb{ereturn list} in Stata (after \code{mestreg}, \code{stmixed}) for more details.
 }
 \description{
 Read Estimation Results From Stata
