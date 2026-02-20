@@ -1,11 +1,11 @@
 Package: stdmest
 Type: Package
 Title: Post-Estimation Predictions for Standardised Hierarchical Contrasts after -mestreg- Models in Stata
-Version: 0.0.0-9000
+Version: 0.0.1
 Authors@R: c(
-  person(given = "Alessandro", 
-         family = "Gasparini", 
-         email = "alessandro.gasparini@reddooranalytics.se", 
+  person(given = "Alessandro",
+         family = "Gasparini",
+         email = "alessandro.gasparini@reddooranalytics.se",
          role = c("aut", "cre")),
   person("Red Door Analytics AB", role = c("cph"))
   )
@@ -19,7 +19,7 @@ BugReports: https://github.com/RedDoorAnalytics/stdmest
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Language: en-GB
-Depends: 
+Depends:
   R (>= 2.10)
 Imports:
   fastGHQuad,
