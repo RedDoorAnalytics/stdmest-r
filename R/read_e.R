@@ -21,16 +21,37 @@ read_e <- function(path) {
   cmd <- readxl::read_excel(path = path, col_names = FALSE, sheet = "cmd")
   cmd <- unlist(cmd, use.names = FALSE)
   # Read e(b)
-  r1 <- readxl::read_excel(path = path, sheet = "e(b)", col_names = FALSE, n_max = 1)
+  r1 <- readxl::read_excel(
+    path = path,
+    sheet = "e(b)",
+    col_names = FALSE,
+    n_max = 1
+  )
   r1 <- unlist(r1, use.names = FALSE)
-  r2 <- readxl::read_excel(path = path, sheet = "e(b)", col_names = FALSE, skip = 1, n_max = 1)
+  r2 <- readxl::read_excel(
+    path = path,
+    sheet = "e(b)",
+    col_names = FALSE,
+    skip = 1,
+    n_max = 1
+  )
   r2 <- unlist(r2, use.names = FALSE)
-  r3 <- readxl::read_excel(path = path, sheet = "e(b)", col_names = FALSE, skip = 2, n_max = 1)
+  r3 <- readxl::read_excel(
+    path = path,
+    sheet = "e(b)",
+    col_names = FALSE,
+    skip = 2,
+    n_max = 1
+  )
   r3$`...1` <- NULL
   eb <- matrix(data = as.numeric(r3[1, ]), nrow = 1)
   # Fix names if -stmixed- models
   if (cmd == "stmixed") {
-    namesfix <- readxl::read_excel(path = path, col_names = FALSE, sheet = "e(cmplabels1)")
+    namesfix <- readxl::read_excel(
+      path = path,
+      col_names = FALSE,
+      sheet = "e(cmplabels1)"
+    )
     namesfix <- unlist(namesfix)
     namesfix <- stringr::str_split_1(string = namesfix, pattern = " ")
     r2[1:length(namesfix)] <- namesfix
@@ -51,22 +72,40 @@ read_e <- function(path) {
     frm <- unlist(frm, use.names = FALSE)
   }
   # Read cmdline
-  cmdline <- readxl::read_excel(path = path, col_names = FALSE, sheet = "cmdline")
+  cmdline <- readxl::read_excel(
+    path = path,
+    col_names = FALSE,
+    sheet = "cmdline"
+  )
   cmdline <- unlist(cmdline, use.names = FALSE)
   # For RP models, extract other stuff:
   if (family == "rp") {
     # Knots:
-    knots <- readxl::read_excel(path = path, col_names = FALSE, sheet = "e(knots1)")
+    knots <- readxl::read_excel(
+      path = path,
+      col_names = FALSE,
+      sheet = "e(knots1)"
+    )
     knots <- unlist(knots, use.names = FALSE)
     knots <- stringr::str_split_1(string = knots, pattern = " ")
     knots <- as.numeric(knots)
     # Orthog:
-    orthog <- readxl::read_excel(path = path, col_names = FALSE, sheet = "e(orthog1)")
+    orthog <- readxl::read_excel(
+      path = path,
+      col_names = FALSE,
+      sheet = "e(orthog1)"
+    )
     orthog <- unlist(orthog, use.names = FALSE)
-    if (is.na(orthog)) orthog <- ""
+    if (is.na(orthog)) {
+      orthog <- ""
+    }
     # RCS rmat:
     if (orthog != "") {
-      rcsrmat <- readxl::read_excel(path = path, col_names = FALSE, sheet = "e(rcsrmat_1)")
+      rcsrmat <- readxl::read_excel(
+        path = path,
+        col_names = FALSE,
+        sheet = "e(rcsrmat_1)"
+      )
       rcsrmat <- as.matrix(rcsrmat)
     }
   }

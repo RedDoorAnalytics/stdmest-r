@@ -40,7 +40,23 @@
 #' @param alpha Confidence level. Defaults to 0.05 for 95% confidence intervals.
 #'
 #' @export
-stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", cicloglog = FALSE, alpha = 0.05) {
+stdmest <- function(
+  t,
+  X,
+  beta,
+  Sigma,
+  b,
+  bse,
+  bref = 0,
+  brefse = 0,
+  contrast = FALSE,
+  distribution,
+  conf.int = FALSE,
+  B = 1000,
+  cimethod = "percentile",
+  cicloglog = FALSE,
+  alpha = 0.05
+) {
   # library(tidyverse)
   # library(haven)
   # devtools::load_all()
@@ -80,12 +96,27 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
   # alpha <- 0.05
 
   # Match
-  cimethod <- match.arg(arg = cimethod, choices = c("percentile", "normal"), several.ok = FALSE)
-  distribution <- match.arg(arg = distribution, choices = c("exponential", "weibull"), several.ok = FALSE)
+  cimethod <- match.arg(
+    arg = cimethod,
+    choices = c("percentile", "normal"),
+    several.ok = FALSE
+  )
+  distribution <- match.arg(
+    arg = distribution,
+    choices = c("exponential", "weibull"),
+    several.ok = FALSE
+  )
 
   # Check that length of b, bse, bref, brefse is the same
-  if (!(length(b) == length(bse) & length(b) == length(bref) & length(b) == length(brefse))) {
-    stop("'b', 'bse', 'bref', and 'brefse' must have the same number of elements.", call. = FALSE)
+  if (
+    !(length(b) == length(bse) &
+      length(b) == length(bref) &
+      length(b) == length(brefse))
+  ) {
+    stop(
+      "'b', 'bse', 'bref', and 'brefse' must have the same number of elements.",
+      call. = FALSE
+    )
   }
 
   #
@@ -99,7 +130,12 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
   } else if (distribution == "weibull") {
     ln_p <- matrix(data = beta[, "ln_p"])
   }
-  if (!is.finite(ln_p)) stop("Could not pick 'ln_p' from 'beta'. Check your input values.", call. = FALSE)
+  if (!is.finite(ln_p)) {
+    stop(
+      "Could not pick 'ln_p' from 'beta'. Check your input values.",
+      call. = FALSE
+    )
+  }
 
   # Create a single combined b to use
   b_sum <- sum(b)
@@ -111,7 +147,13 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
   if (contrast) {
     bref_sum <- sum(bref)
     bref_sum <- matrix(data = bref_sum, ncol = 1)
-    Sref <- predictMeanSurv1R(t = t, X = X, betaX = betaX, b = bref_sum, ln_p = ln_p)
+    Sref <- predictMeanSurv1R(
+      t = t,
+      X = X,
+      betaX = betaX,
+      b = bref_sum,
+      ln_p = ln_p
+    )
     Sdiff <- S - Sref
   }
   # CIs
@@ -119,7 +161,11 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
     # For this, resample new parameters/random effects B times
     new_beta <- mvtnorm::rmvnorm(n = B, mean = beta, sigma = Sigma)
     colnames(new_beta) <- colnames(beta)
-    new_b <- mvtnorm::rmvnorm(n = B, mean = b, sigma = diag(bse^2, nrow = length(bse), ncol = length(bse)))
+    new_b <- mvtnorm::rmvnorm(
+      n = B,
+      mean = b,
+      sigma = diag(bse^2, nrow = length(bse), ncol = length(bse))
+    )
     new_b <- matrixStats::rowSums2(x = new_b)
     new_b <- matrix(data = new_b, ncol = 1)
     new_betaX <- new_beta[, colnames(new_beta) %in% colnames(X), drop = FALSE]
@@ -130,23 +176,51 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
       new_ln_p <- new_beta[, "ln_p", drop = FALSE]
     }
     if (contrast) {
-      new_bref <- mvtnorm::rmvnorm(n = B, mean = bref, sigma = diag(brefse^2, nrow = length(brefse), ncol = length(brefse)))
+      new_bref <- mvtnorm::rmvnorm(
+        n = B,
+        mean = bref,
+        sigma = diag(brefse^2, nrow = length(brefse), ncol = length(brefse))
+      )
       new_bref <- matrixStats::rowSums2(x = new_bref)
       new_bref <- matrix(data = new_bref, ncol = 1)
     }
-    new_S <- predictMeanSurv1R(t = t, X = X, betaX = new_betaX, b = new_b, ln_p = new_ln_p)
+    new_S <- predictMeanSurv1R(
+      t = t,
+      X = X,
+      betaX = new_betaX,
+      b = new_b,
+      ln_p = new_ln_p
+    )
     if (contrast) {
-      new_Sref <- predictMeanSurv1R(t = t, X = X, betaX = new_betaX, b = new_bref, ln_p = new_ln_p)
+      new_Sref <- predictMeanSurv1R(
+        t = t,
+        X = X,
+        betaX = new_betaX,
+        b = new_bref,
+        ln_p = new_ln_p
+      )
       new_Sdiff <- new_S - new_Sref
     }
     if (cimethod == "percentile") {
       S_conf.low <- matrixStats::rowQuantiles(x = new_S, probs = alpha / 2)
       S_conf.high <- matrixStats::rowQuantiles(x = new_S, probs = 1 - alpha / 2)
       if (contrast) {
-        Sref_conf.low <- matrixStats::rowQuantiles(x = new_Sref, probs = alpha / 2)
-        Sref_conf.high <- matrixStats::rowQuantiles(x = new_Sref, probs = 1 - alpha / 2)
-        Sdiff_conf.low <- matrixStats::rowQuantiles(x = new_Sdiff, probs = alpha / 2)
-        Sdiff_conf.high <- matrixStats::rowQuantiles(x = new_Sdiff, probs = 1 - alpha / 2)
+        Sref_conf.low <- matrixStats::rowQuantiles(
+          x = new_Sref,
+          probs = alpha / 2
+        )
+        Sref_conf.high <- matrixStats::rowQuantiles(
+          x = new_Sref,
+          probs = 1 - alpha / 2
+        )
+        Sdiff_conf.low <- matrixStats::rowQuantiles(
+          x = new_Sdiff,
+          probs = alpha / 2
+        )
+        Sdiff_conf.high <- matrixStats::rowQuantiles(
+          x = new_Sdiff,
+          probs = 1 - alpha / 2
+        )
       }
     } else if (cimethod == "normal") {
       z.crit <- stats::qnorm(p = 1 - alpha / 2)
@@ -165,8 +239,10 @@ stdmest <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, contrast = 
         if (cicloglog) {
           new_Sref <- cloglog(new_Sref)
           new_Sref[new_Sref == -Inf | new_Sref == Inf] <- 0.0
-          Sref_conf.low <- cloglog(Sref) + matrixStats::rowSds(x = new_Sref) * z.crit
-          Sref_conf.high <- cloglog(Sref) - matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.low <- cloglog(Sref) +
+            matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.high <- cloglog(Sref) -
+            matrixStats::rowSds(x = new_Sref) * z.crit
           Sref_conf.low <- cexpexp(Sref_conf.low)
           Sref_conf.high <- cexpexp(Sref_conf.high)
         } else {

@@ -20,7 +20,11 @@ Stata.model.matrix <- function(fixed, random, data, eb) {
   colnames(mm)[grepl(pattern = "Intercept", x = colnames(mm))] <- "_cons"
   # Adjust names that are not syntactically valid in R (but okay in Stata)
   idx <- which(x = grepl(pattern = "`", x = colnames(mm)))
-  colnames(mm)[idx] <- stringr::str_sub(string = colnames(mm)[idx], start = 2L, end = -2L)
+  colnames(mm)[idx] <- stringr::str_sub(
+    string = colnames(mm)[idx],
+    start = 2L,
+    end = -2L
+  )
   # Reorder design matrix
   mm <- mm[, colnames(eb)[colnames(eb) %in% colnames(mm)]]
   ## Random effects part:

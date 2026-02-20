@@ -46,7 +46,25 @@
 #'     between accuracy and computational cost.
 #'
 #' @export
-stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargname, contrast = FALSE, distribution, conf.int = FALSE, B = 1000, cimethod = "percentile", cicloglog = FALSE, alpha = 0.05, nk = 7) {
+stdmestm <- function(
+  t,
+  X,
+  beta,
+  Sigma,
+  b,
+  bse,
+  bref = 0,
+  brefse = 0,
+  varmargname,
+  contrast = FALSE,
+  distribution,
+  conf.int = FALSE,
+  B = 1000,
+  cimethod = "percentile",
+  cicloglog = FALSE,
+  alpha = 0.05,
+  nk = 7
+) {
   # dt <- read_dta(file = "data-raw/data3Lsim-pp.dta") |>
   #   zap_formats() |>
   #   zap_label() |>
@@ -89,11 +107,21 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
   # nk <- 7
 
   # Match
-  cimethod <- match.arg(arg = cimethod, choices = c("percentile", "normal"), several.ok = FALSE)
-  distribution <- match.arg(arg = distribution, choices = c("exponential", "weibull"), several.ok = FALSE)
+  cimethod <- match.arg(
+    arg = cimethod,
+    choices = c("percentile", "normal"),
+    several.ok = FALSE
+  )
+  distribution <- match.arg(
+    arg = distribution,
+    choices = c("exponential", "weibull"),
+    several.ok = FALSE
+  )
 
   # Check that
-  if (!is.finite(beta[, varmargname])) stop("Could not pick 'varmargname' from 'beta'. Check your input values.")
+  if (!is.finite(beta[, varmargname])) {
+    stop("Could not pick 'varmargname' from 'beta'. Check your input values.")
+  }
   varmarg <- beta[, varmargname, drop = FALSE]
 
   # Data for GH quadrature
@@ -110,15 +138,36 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
   } else if (distribution == "weibull") {
     ln_p <- matrix(data = beta[, "ln_p"])
   }
-  if (!is.finite(ln_p)) stop("Could not pick 'ln_p' from 'beta'. Check your input values.", call. = FALSE)
+  if (!is.finite(ln_p)) {
+    stop(
+      "Could not pick 'ln_p' from 'beta'. Check your input values.",
+      call. = FALSE
+    )
+  }
 
   # Point estimate
-  S <- predictMeanIntSurvR(t = t, X = X, betaX = betaX, b = b, ln_p = ln_p, varmarg = varmarg, GHdata = GHdata)
+  S <- predictMeanIntSurvR(
+    t = t,
+    X = X,
+    betaX = betaX,
+    b = b,
+    ln_p = ln_p,
+    varmarg = varmarg,
+    GHdata = GHdata
+  )
   # S <- predictMeanIntSurv(t = t, X = X, betaX = betaX, b = b, ln_p = ln_p, varmarg = varmarg, GHx = GHdata$x, GHw = GHdata$w)
 
   # Contrast, if required
   if (contrast) {
-    Sref <- predictMeanIntSurvR(t = t, X = X, betaX = betaX, b = bref, ln_p = ln_p, varmarg = varmarg, GHdata = GHdata)
+    Sref <- predictMeanIntSurvR(
+      t = t,
+      X = X,
+      betaX = betaX,
+      b = bref,
+      ln_p = ln_p,
+      varmarg = varmarg,
+      GHdata = GHdata
+    )
     # Sref <- predictMeanIntSurv(t = t, X = X, betaX = betaX, b = bref, ln_p = ln_p, varmarg = varmarg, GHx = GHdata$x, GHw = GHdata$w)
     Sdiff <- S - Sref
   }
@@ -127,7 +176,11 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
     # For this, resample new parameters/random effects B times
     new_beta <- mvtnorm::rmvnorm(n = B, mean = beta, sigma = Sigma)
     colnames(new_beta) <- colnames(beta)
-    new_b <- mvtnorm::rmvnorm(n = B, mean = b, sigma = diag(bse^2, nrow = length(bse), ncol = length(bse)))
+    new_b <- mvtnorm::rmvnorm(
+      n = B,
+      mean = b,
+      sigma = diag(bse^2, nrow = length(bse), ncol = length(bse))
+    )
     new_b <- matrixStats::rowSums2(x = new_b)
     new_b <- matrix(data = new_b, ncol = 1)
     new_betaX <- new_beta[, colnames(new_beta) %in% colnames(X), drop = FALSE]
@@ -143,15 +196,35 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
     new_varmarg <- pmax(new_varmarg, .Machine$double.eps)
     #
     if (contrast) {
-      new_bref <- mvtnorm::rmvnorm(n = B, mean = bref, sigma = diag(brefse^2, nrow = length(brefse), ncol = length(brefse)))
+      new_bref <- mvtnorm::rmvnorm(
+        n = B,
+        mean = bref,
+        sigma = diag(brefse^2, nrow = length(brefse), ncol = length(brefse))
+      )
       new_bref <- matrixStats::rowSums2(x = new_bref)
       new_bref <- matrix(data = new_bref, ncol = 1)
     }
-    new_S <- predictMeanIntSurvR(t = t, X = X, betaX = new_betaX, b = new_b, ln_p = new_ln_p, varmarg = new_varmarg, GHdata = GHdata)
+    new_S <- predictMeanIntSurvR(
+      t = t,
+      X = X,
+      betaX = new_betaX,
+      b = new_b,
+      ln_p = new_ln_p,
+      varmarg = new_varmarg,
+      GHdata = GHdata
+    )
     # new_S <- predictMeanIntSurv(t = t, X = X, betaX = new_betaX, b = new_b, ln_p = new_ln_p, varmarg = new_varmarg, GHx = GHdata$x, GHw = GHdata$w)
 
     if (contrast) {
-      new_Sref <- predictMeanIntSurvR(t = t, X = X, betaX = new_betaX, b = new_bref, ln_p = new_ln_p, varmarg = new_varmarg, GHdata = GHdata)
+      new_Sref <- predictMeanIntSurvR(
+        t = t,
+        X = X,
+        betaX = new_betaX,
+        b = new_bref,
+        ln_p = new_ln_p,
+        varmarg = new_varmarg,
+        GHdata = GHdata
+      )
       # new_Sref <- predictMeanIntSurv(t = t, X = X, betaX = new_betaX, b = new_bref, ln_p = new_ln_p, varmarg = new_varmarg, GHx = GHdata$x, GHw = GHdata$w)
       new_Sdiff <- new_S - new_Sref
     }
@@ -159,10 +232,22 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
       S_conf.low <- matrixStats::rowQuantiles(x = new_S, probs = alpha / 2)
       S_conf.high <- matrixStats::rowQuantiles(x = new_S, probs = 1 - alpha / 2)
       if (contrast) {
-        Sref_conf.low <- matrixStats::rowQuantiles(x = new_Sref, probs = alpha / 2)
-        Sref_conf.high <- matrixStats::rowQuantiles(x = new_Sref, probs = 1 - alpha / 2)
-        Sdiff_conf.low <- matrixStats::rowQuantiles(x = new_Sdiff, probs = alpha / 2)
-        Sdiff_conf.high <- matrixStats::rowQuantiles(x = new_Sdiff, probs = 1 - alpha / 2)
+        Sref_conf.low <- matrixStats::rowQuantiles(
+          x = new_Sref,
+          probs = alpha / 2
+        )
+        Sref_conf.high <- matrixStats::rowQuantiles(
+          x = new_Sref,
+          probs = 1 - alpha / 2
+        )
+        Sdiff_conf.low <- matrixStats::rowQuantiles(
+          x = new_Sdiff,
+          probs = alpha / 2
+        )
+        Sdiff_conf.high <- matrixStats::rowQuantiles(
+          x = new_Sdiff,
+          probs = 1 - alpha / 2
+        )
       }
     } else if (cimethod == "normal") {
       z.crit <- stats::qnorm(p = 1 - alpha / 2)
@@ -181,8 +266,10 @@ stdmestm <- function(t, X, beta, Sigma, b, bse, bref = 0, brefse = 0, varmargnam
         if (cicloglog) {
           new_Sref <- cloglog(new_Sref)
           new_Sref[new_Sref == -Inf | new_Sref == Inf] <- 0.0
-          Sref_conf.low <- cloglog(Sref) + matrixStats::rowSds(x = new_Sref) * z.crit
-          Sref_conf.high <- cloglog(Sref) - matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.low <- cloglog(Sref) +
+            matrixStats::rowSds(x = new_Sref) * z.crit
+          Sref_conf.high <- cloglog(Sref) -
+            matrixStats::rowSds(x = new_Sref) * z.crit
           Sref_conf.low <- cexpexp(Sref_conf.low)
           Sref_conf.high <- cexpexp(Sref_conf.high)
         } else {
