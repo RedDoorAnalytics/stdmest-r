@@ -21,8 +21,8 @@ in Stata. It is the R equivalent of the
 Stata.
 
 This package can be used to obtain predictions of, e.g., standardised
-survival probabilities while fixing best linear unbiased predictions
-(BLUPs) of the random effects at any level of the hierarchy.
+survival probabilities while fixing posterior predictions of the random
+effects at any level of the hierarchy.
 
 In other words, {stdmest} can obtain marginal predictions standardising
 across observed covariates (i.e., the fixed effects) while fixing
@@ -43,3 +43,10 @@ repository by typing the following in your Stata console:
 # install.packages("devtools")
 devtools::install_github("RedDoorAnalytics/stdmest-r", build_vignettes = TRUE)
 ```
+
+## References
+
+- Gasparini, A., Crowther, M.J. & Schaffer, J.M. Standardized survival
+  probabilities and contrasts between hierarchical units in multilevel
+  survival models. BMC Med Res Methodol (2026).
+  <https://doi.org/10.1186/s12874-026-02782-8>

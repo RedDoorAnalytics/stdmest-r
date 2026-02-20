@@ -15,7 +15,7 @@ This is a prototype package to implement regression standardisation for (fair) c
 The {stdmest} package implements post-estimation predictions of standardised survival probabilities after fitting hierarchical survival models using -[`mestreg`](https://www.stata.com/manuals/memestreg.pdf)- in Stata.
 It is the R equivalent of the -[`stdmest`](https://github.com/RedDoorAnalytics/stdmest)- command in Stata.
 
-This package can be used to obtain predictions of, e.g., standardised survival probabilities while fixing best linear unbiased predictions (BLUPs) of the random effects at any level of the hierarchy.
+This package can be used to obtain predictions of, e.g., standardised survival probabilities while fixing posterior predictions of the random effects at any level of the hierarchy.
 
 In other words, {stdmest} can obtain marginal predictions standardising across observed covariates (i.e., the fixed effects) while fixing predicted values of the random effects.
 Built-in post-estimation commands for -`mestreg`- can do the opposite, i.e., marginalising over the random effects.
@@ -30,3 +30,7 @@ The development version of `stdmest` can be installed from this GitHub repositor
 # install.packages("devtools")
 devtools::install_github("RedDoorAnalytics/stdmest-r", build_vignettes = TRUE)
 ```
+
+## References
+
+* Gasparini, A., Crowther, M.J. & Schaffer, J.M. Standardized survival probabilities and contrasts between hierarchical units in multilevel survival models. BMC Med Res Methodol (2026). https://doi.org/10.1186/s12874-026-02782-8
