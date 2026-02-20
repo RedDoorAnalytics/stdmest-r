@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/RedDoorAnalytics/stdmest-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RedDoorAnalytics/stdmest-r/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This is a prototype package to implement regression standardisation for

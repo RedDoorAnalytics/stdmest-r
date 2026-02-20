@@ -1,7 +1,7 @@
 Package: stdmest
 Type: Package
 Title: Post-Estimation Predictions for Standardised Hierarchical Contrasts after -mestreg- Models in Stata
-Version: 0.0.1
+Version: 0.0.1-9000
 Authors@R: c(
   person(given = "Alessandro",
          family = "Gasparini",
@@ -9,13 +9,16 @@ Authors@R: c(
          role = c("aut", "cre")),
   person("Red Door Analytics AB", role = c("cph"))
   )
-Description: What the package does (one paragraph).
+Description: Compute predictions of, e.g., standardised survival probabilities while fixing posterior
+  predictions of the random effects at any level of the hierarchy after fitting -mestreg- models.
+  Marginal predictions standardising across observed covariates (i.e., the fixed effects), while fixing
+  predicted values of the random effects, can be obtained.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
-URL: https://github.com/RedDoorAnalytics/stdmest
-BugReports: https://github.com/RedDoorAnalytics/stdmest
+URL: https://github.com/RedDoorAnalytics/stdmest-r
+BugReports: https://github.com/RedDoorAnalytics/stdmest-r/issues
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Language: en-GB
