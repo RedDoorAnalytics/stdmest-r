@@ -14,12 +14,15 @@
 #'
 read_e <- function(path) {
   # path <- "data-raw/data3CIA-ebV-weibull.xlsx"
-  # path <- "data-raw/data3CIA-ebV-rp3-orthog.xlsx"
-  # path <- "data-raw/data3CIA-ebV-rp3-noorthog.xlsx"
 
   # Identify model
   cmd <- readxl::read_excel(path = path, col_names = FALSE, sheet = "cmd")
   cmd <- unlist(cmd, use.names = FALSE)
+  include_eqname <- switch(
+    cmd,
+    "mestreg" = FALSE,
+    "stmixed" = TRUE
+  )
   # Read e(b)
   r1 <- readxl::read_excel(
     path = path,
@@ -54,10 +57,14 @@ read_e <- function(path) {
     )
     namesfix <- unlist(namesfix)
     namesfix <- stringr::str_split_1(string = namesfix, pattern = " ")
-    r2[1:length(namesfix)] <- namesfix
+    r2[seq_len(length(namesfix))] <- namesfix
   }
   # Assign names
-  colnames(eb) <- paste0(r1, ":", r2)
+  if (isTRUE(include_eqname)) {
+    colnames(eb) <- paste0(r1, ":", r2) # equation name : parameter name
+  } else {
+    colnames(eb) <- r2 # only parameter name, not equation name
+  }
   # Read e(V)
   eV <- readxl::read_excel(path = path, col_names = FALSE, sheet = "e(V)")
   eV <- as.matrix(eV)
